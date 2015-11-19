@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-duration-format/1.3.0/moment-duration-format.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.9/d3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.min.js"></script>
+    <script src="./components/javascript-detect-element-resize/detect-element-resize.js"></script>
+    <link href='//fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Roboto+Condensed:400,300' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.0.6/material.min.css">
+    <link rel="stylesheet" type="text/css" href="main.css">
+  </head>
+  
+  <body>
+    <div class="content">
+      <button id="addclient" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">add client</button>
+      <button id="removeclient" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">remove client</button>
+      <button id="addfunction" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">add function</button>
+      <button id="removefunction" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">remove function</button>
+
+      <paper-material elevation="1">
+        <div class="card-header" class="vertical layout">
+          <div class="horizontal end-justified layout">
+            <span class="self-start">Processes</span>
+            <div class="model-instance-status status1" self-center></div>
+          </div>
+        </div>
+        <p>Zoom:
+          <paper-button raised id="h4">
+            <a href="#">4h</a>
+          </paper-button>
+          <paper-button id="h8">
+            <a href="#">8h</a>
+          </paper-button>
+          <paper-button id="d1">
+            <a href="#">1d</a>
+          </paper-button>
+          <paper-button id="d5">
+            <a href="#">5d</a>
+          </paper-button>
+        </p>
+        <div id="chart" class="timeline"></div>
+      </paper-material>
+    </div>
+  </body>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.6.7/d3-tip.js"></script>
+  <script src="context-menu-d3.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.0.6/material.min.js"></script>
+  <script src="ea-timeline.js"></script>
+  <script>
+    window.onload = function runD3code() {
+        
+       var data = [
+            { key: 'one', values: [
+              { name: 'testname', startTime: d3.time.hour.offset(new Date(),-7), endTime: d3.time.hour.offset(new Date(),-5), status: 1,
+                docLink:'http://google.com' }
+              ]
+            },
+            {
+                key: 'two', values: [
+                  {
+                      name: 'testname', startTime: d3.time.hour.offset(new Date(), -29), endTime: d3.time.hour.offset(new Date(), -25), status: 1,
+                      docLink: 'http://google.com'
+                  }
+                ]
+
+            }
+            
+       ];
+
+       var data2 = [
+           { key: 'one', name: 'testname1', startTime: d3.time.hour.offset(new Date(), -7), endTime: d3.time.hour.offset(new Date(), -5), status: 1, docLink: 'http://google.com' },
+           { key: 'one', name: 'testname2', startTime: d3.time.hour.offset(new Date(), -10), endTime: d3.time.hour.offset(new Date(), -8), status: 1, docLink: 'http://google.com' },
+       ]
+        
+       var cf = crossfilter(data2);
+       var ce = [d3.time.hour.offset(new Date(), -9), new Date()];
+       cf.key = cf.dimension(function (d) { return d.key; });
+       var timespan = cf.dimension(function (d) { return { start: d.startTime, end: d.endTime } });
+
+       //var nested_data = d3.nest().key(function (d) { return d.key }).entries(data2);
+       var nestBykey = d3.nest().key(function (d) { return d.key });
+
+       var startFilter = timespan.filterFunction(
+           function (d) {
+               if (d.start >= ce[0] && d.start <= ce[1]) {
+                   return true;
+               } else if (d.end >= ce[0] && d.end <= ce[1]) {
+                   return true
+               }
+               return false;
+           });
+       var gg = startFilter.top(Infinity);
+
+        var timelinechart = d3.select('#chart');
+        var t = new EA.Timeline(timelinechart);
+        t.contextExtent = ce;
+        //t.update(data);
+        //t.mainBarHeight= 20;
+        t.update(nestBykey.entries(gg));
+        
+       var resizeElement = document.getElementById('chart'),
+        resizeCallback = function() {
+          console.log('resize');
+          t.resize();
+        }; 
+        addResizeListener(resizeElement, resizeCallback);
+        
+        d3.select("#addclient").on("click", function () {
+          data.push(
+            { key: 'test'+ 8*Math.random(), values: [] }
+          );
+        t.update(data);
+        });
+        
+        d3.select("#removeclient").on("click", function () {
+          data.pop();
+          t.update(data);          
+        });
+
+        d3.select("#addfunction").on("click", function () {
+          var item = data[Math.floor(Math.random()*data.length)];
+          
+          item.values.push(
+           { name: 'added function', startTime: d3.time.hour.offset(new Date(),0) , status: 1}
+          );
+          t.update(data);          
+        });  
+
+        d3.select("#removefunction").on("click", function () {
+          var item = data[Math.floor(Math.random()*data.length)];
+          item.values.pop(Math.floor(Math.random()*item.values.length));
+          t.update(data);          
+        });
+        
+        d3.select("#h4").on("click", function () {
+          console.log('4h');
+          t.zoom(4*60*60*1000);        
+        });
+        
+        d3.select("#h8").on("click", function () {
+          console.log('8h');
+           t.zoom(8*60*60*1000);       
+        });
+        
+        d3.select("#d1").on("click", function () {
+          console.log('d1');
+           t.zoom(24*60*60*1000);       
+        });
+        
+        d3.select("#d5").on("click", function () {
+          console.log('d5');
+          t.zoom(24*5*60*60*1000);
+        });
+
+   };
+  </script>
+
+</html>

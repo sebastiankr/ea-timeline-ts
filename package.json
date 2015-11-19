@@ -1,0 +1,19 @@
+{
+  "name": "ea-timeline-ts",
+  "version": "0.0.1",
+  "author": "Sebastian Kropp",
+  "dependencies": {},
+  "devDependencies": {
+    "browser-sync": "^2.10.0",
+    "gulp": "^3.6.2",
+    "gulp-shell": "^0.4.2",
+    "gulp-tsc": "^0.10.1",
+    "gulp-tslint": "^2.0.0",
+    "mocha": "*",
+    "run-sequence": "^1.1.1"
+  },
+  "scripts": {
+    "main": "gulp buildrun",
+    "test": "gulp build && mocha"
+  }
+}
