@@ -15,7 +15,7 @@ This project uses [gulp](http://gulpjs.com/) as its build system.
 
 1. Install gulp: `$ npm install -g gulp && npm install -g tsd`
 2. Install dependencies: `$ npm install && tsd install`
-3. Build and run: `$ gulp buildrun`
+3. Build and run: `$ gulp serve`
 
 ## Credits
 
