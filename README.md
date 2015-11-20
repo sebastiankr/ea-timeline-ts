@@ -2,7 +2,7 @@
 
 Reactive timeline/gantt chart using D3 written in typescript.
 
-[Demo](http://sebastian.kropponline.de/)
+<!--[Demo](http://sebastian.kropponline.de/)-->
 ## Features
 
 - Easy to update with new data
