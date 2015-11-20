@@ -23,6 +23,7 @@ This project uses [gulp](http://gulpjs.com/) as its build system.
 - add handles on brush
 - improve design
 - update typescript to new d3.d.ts
+- add demo
 
 ## Credits
 
