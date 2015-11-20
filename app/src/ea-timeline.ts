@@ -1,28 +1,30 @@
 /// <reference path="typings/tsd.d.ts" />
+/// <reference path="tsd.missing.d.ts" />
 
 module EA {
+
     export class Timeline {
         'use strict';
-        element: d3.Selection<HTMLElement>;
+        element: D3.Selection;
         data: Array<any>;
         width: number;
         margin: any;
 
-        x: d3.time.Scale<number, number>;
-        xBrush: any;
+        x: D3.Scale.TimeScale;
+        xBrush: D3.Scale.TimeScale;
 
-        xAxis: d3.svg.Axis;
-        xAxis2: d3.svg.Axis;
-        xAxisBrush: d3.svg.Axis;
+        xAxis: D3.Svg.Axis;
+        xAxis2: D3.Svg.Axis;
+        xAxisBrush: D3.Svg.Axis;
 
-        y: d3.scale.Ordinal<String, {}>;
-        yAxis: d3.svg.Axis;
+        y: D3.Scale.OrdinalScale;
+        yAxis: D3.Svg.Axis;
 
-        svg: d3.Selection<HTMLElement>;
-        chart: d3.Selection<HTMLElement>;
-        context: d3.Selection<HTMLElement>;
+        svg: D3._Selection<any>;
+        chart: D3._Selection<any>;
+        context: D3._Selection<any>;
 
-        brush: d3.svg.Brush<any>;
+        brush: D3.Svg.Brush;
 
         private _mainBarHeight: number = 40;
         get mainBarHeight(): number {
@@ -37,10 +39,10 @@ module EA {
         focusMargin: number = 35;
         contextHeight: number = 60;
         tip: any;
-        focusExtent: any = [d3.time.hour.offset(new Date(), -1 * 24), d3.time.hour.offset(new Date(), 0)];
+        focusExtent: [Date, Date] = [d3.time.hour.offset(new Date(), -1 * 24), d3.time.hour.offset(new Date(), 0)];
         contextExtent: [Date, Date] = [d3.time.day.offset(new Date(), -5), new Date()];
 
-        constructor(element: d3.Selection<HTMLElement>, data: Array<any> = []) {
+        constructor(element: D3.Selection, data: Array<any> = []) {
             var self = this;
             this.element = element;
             this.data = data;
@@ -72,8 +74,7 @@ module EA {
                 .extent(this.focusExtent)
                 .on("brush", () => {
                     if (!this.brush.empty()) {
-                        var extent: any = this.brush.extent();
-                        var extent1 = extent[1];
+                        var extent: [Date, Date] = <[Date, Date]>this.brush.extent();
                         var now = new Date();
                         if (extent[1] > now) {
                             extent[1] = now;
@@ -169,7 +170,7 @@ module EA {
         
             // set height based on data
             height = this.y.rangeExtent()[1];
-            d3.select(this.chart[0].parentNode)
+            d3.select(this.chart.node().parentNode)
                 .style('height', (height + this.margin.top + this.focusMargin + this.contextHeight + this.margin.bottom) + 'px')
 
             this.svg.select('.context').attr('transform', () => {
@@ -210,10 +211,10 @@ module EA {
                 .on('mouseout', this.tip.hide)
                 .on('contextmenu', d3.contextMenu(function(data) {
                     var menu = [];
-                    if (data.docLink) {
+                    if(data.docLink){
                         menu.push({
                             title: '<core-icon icon="help" self-center></core-icon>Documentation',
-                            action: function(elm, d, i) {
+                             action: function(elm, d, i) {
                                 console.log('Item #1 clicked!');
                                 window.location.href = d.docLink;
                             }
@@ -222,18 +223,15 @@ module EA {
                     return menu;
                 }));
 
-            funct.attr('transform', (d: any) => {
+            funct.attr('transform', (d) => {
                 return 'translate(' + self.x(d.startTime) + ',0)'
             })
-                .attr('class', (d: any) => {
+                .attr('class', (d) => {
                     var cls = 'function';
-                    if (!d.endTime) {
+                    if (!d.endTime)
                         cls += ' running';
-                    }
-                    if (d.status) {
+                    if (d.status)
                         cls += ' status' + d.status;
-                    }
-
                     return cls;
                 })
                 .attr('height', self.y.rangeBand())
@@ -263,10 +261,10 @@ module EA {
 
             contextFunct.enter().append('rect');
 
-            contextFunct.attr('transform', (d: any) => {
+            contextFunct.attr('transform', (d) => {
                 return 'translate(' + self.xBrush(d.startTime) + ',0)'
             })
-                .attr('class', (d: any) => {
+                .attr('class', (d) => {
                     var cls = 'function';
                     if (!d.endTime)
                         cls += ' running';
@@ -324,7 +322,7 @@ module EA {
             this.xBrush.range([0, this.width]);
             //this.brush.clear();
             
-            d3.select(this.chart[0].parentNode)
+            d3.select(this.chart.node().parentNode)
             //.style('height', (this.y.rangeExtent()[1] + this.margin.top + this.margin.bottom + 300) + 'px')
                 .style('width', (this.width + (this.margin).left + this.margin.right) + 'px');
 
@@ -349,7 +347,7 @@ module EA {
             this.context.select('.x.brush').call(this.brush.extent(this.focusExtent));
         }
 
-        calculateWidth = function(d, xa: any) {
+        calculateWidth = function(d, xa: D3.Scale.TimeScale) {
             var width: number = 0;
             if (!d.endTime)
                 width = xa(new Date()) - xa(d.startTime);
@@ -361,4 +359,5 @@ module EA {
         };
     }
 }
+
 this.EA = EA;
