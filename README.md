@@ -17,13 +17,20 @@ This project uses [gulp](http://gulpjs.com/) as its build system.
 2. Install dependencies: `$ npm install && tsd install`
 3. Build and run: `$ gulp serve`
 
+## TODO
+
+- enable text within bars
+- add handles on brush
+- improve design
+- update typescript to new d3.d.ts
+
 ## Credits
 
 _Inspired by_
 
-> https://github.com/jiahuang/d3-timeline 
-> https://gist.github.com/eyeseast/6407300 
-> http://bl.ocks.org/dk8996/5538271 
+> - https://github.com/jiahuang/d3-timeline 
+> - https://gist.github.com/eyeseast/6407300 
+> - http://bl.ocks.org/dk8996/5538271 
 
 ## License
 
