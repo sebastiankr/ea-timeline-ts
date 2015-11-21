@@ -2,29 +2,34 @@
 /// <reference path="tsd.missing.d.ts" />
 
 module EA {
-
+    export interface TimelineValue {
+        name: string;
+        startTime: Date;
+        endTime: Date;
+        status: string;
+    }
     export class Timeline {
         'use strict';
-        element: D3.Selection;
+        element: d3.Selection<HTMLElement>;
         data: Array<any>;
         width: number;
         margin: any;
 
-        x: D3.Scale.TimeScale;
-        xBrush: D3.Scale.TimeScale;
+        x: d3.time.Scale<any, any>;
+        xBrush: d3.time.Scale<any, any>;
 
-        xAxis: D3.Svg.Axis;
-        xAxis2: D3.Svg.Axis;
-        xAxisBrush: D3.Svg.Axis;
+        xAxis: d3.svg.Axis;
+        xAxis2: d3.svg.Axis;
+        xAxisBrush: d3.svg.Axis;
 
-        y: D3.Scale.OrdinalScale;
-        yAxis: D3.Svg.Axis;
+        y: d3.scale.Ordinal<String, any>;
+        yAxis: d3.svg.Axis;
 
-        svg: D3._Selection<any>;
-        chart: D3._Selection<any>;
-        context: D3._Selection<any>;
+        svg: d3.Selection<HTMLElement>;
+        chart: d3.Selection<HTMLElement>;
+        context: d3.Selection<HTMLElement>;
 
-        brush: D3.Svg.Brush;
+        brush: d3.svg.Brush<any>;
 
         private _mainBarHeight: number = 40;
         get mainBarHeight(): number {
@@ -42,7 +47,7 @@ module EA {
         focusExtent: [Date, Date] = [d3.time.hour.offset(new Date(), -1 * 24), d3.time.hour.offset(new Date(), 0)];
         contextExtent: [Date, Date] = [d3.time.day.offset(new Date(), -5), new Date()];
 
-        constructor(element: D3.Selection, data: Array<any> = []) {
+        constructor(element, data: Array<TimelineValue> = []) {
             var self = this;
             this.element = element;
             this.data = data;
@@ -74,7 +79,7 @@ module EA {
                 .extent(this.focusExtent)
                 .on("brush", () => {
                     if (!this.brush.empty()) {
-                        var extent: [Date, Date] = <[Date, Date]>this.brush.extent();
+                        var extent: [Date, Date] = this.brush.extent();
                         var now = new Date();
                         if (extent[1] > now) {
                             extent[1] = now;
@@ -211,10 +216,10 @@ module EA {
                 .on('mouseout', this.tip.hide)
                 .on('contextmenu', d3.contextMenu(function(data) {
                     var menu = [];
-                    if(data.docLink){
+                    if (data.docLink) {
                         menu.push({
                             title: '<core-icon icon="help" self-center></core-icon>Documentation',
-                             action: function(elm, d, i) {
+                            action: function(elm, d, i) {
                                 console.log('Item #1 clicked!');
                                 window.location.href = d.docLink;
                             }
@@ -223,10 +228,10 @@ module EA {
                     return menu;
                 }));
 
-            funct.attr('transform', (d) => {
+            funct.attr('transform', (d: TimelineValue) => {
                 return 'translate(' + self.x(d.startTime) + ',0)'
             })
-                .attr('class', (d) => {
+                .attr('class', (d: TimelineValue) => {
                     var cls = 'function';
                     if (!d.endTime)
                         cls += ' running';
@@ -261,10 +266,10 @@ module EA {
 
             contextFunct.enter().append('rect');
 
-            contextFunct.attr('transform', (d) => {
+            contextFunct.attr('transform', (d: TimelineValue) => {
                 return 'translate(' + self.xBrush(d.startTime) + ',0)'
             })
-                .attr('class', (d) => {
+                .attr('class', (d: TimelineValue) => {
                     var cls = 'function';
                     if (!d.endTime)
                         cls += ' running';
@@ -347,7 +352,7 @@ module EA {
             this.context.select('.x.brush').call(this.brush.extent(this.focusExtent));
         }
 
-        calculateWidth = function(d, xa: D3.Scale.TimeScale) {
+        calculateWidth = function(d, xa) {
             var width: number = 0;
             if (!d.endTime)
                 width = xa(new Date()) - xa(d.startTime);
