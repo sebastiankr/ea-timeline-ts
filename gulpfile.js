@@ -43,8 +43,10 @@ gulp.task('compile:typescript', function () {
       module: "commonjs",
       emitError: false
     }))
-    .pipe(gulp.dest(paths.tscripts.dest));
+    .pipe(gulp.dest(paths.tscripts.dest))
+    .pipe(browserSync.stream());
 });
+
 gulp.task('copy:html', function () {
   return gulp
     .src(paths.html.src)
@@ -73,7 +75,7 @@ gulp.task('serve', ['build'], function() {
     });
     
     gulp.watch(paths.tscripts.src, ['ts-watch']);
-    gulp.watch(paths.html.src, ['html-watch']);
+    gulp.watch(paths.html.src, ['html-watch']).on('change', browserSync.reload);
 });
 gulp.task('ts-watch', ['compile:typescript'], browserSync.reload);
 gulp.task('html-watch', ['copy:html'], browserSync.reload);
