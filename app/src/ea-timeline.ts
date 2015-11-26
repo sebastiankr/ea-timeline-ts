@@ -2,6 +2,8 @@
 /// <reference path="tsd.missing.d.ts" />
 
 module EA {
+    "use strict"
+    
     export interface TimelineValue {
         name: string;
         startTime: Date;
