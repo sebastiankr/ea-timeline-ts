@@ -132,9 +132,15 @@ window.onload = function runD3code() {
           t.zoom(24*5*60*60*1000);
         });
         
+        var w = window.innerWidth;
         window.onresize = function resize() {
-          console.log("resize event detected!");
-          t.resize();
+          if(w!=this.innerWidth){
+             //console.log("resize event detected!" + this.innerWidth);
+          
+              t.resize();
+              w=this.innerWidth;
+          }
+         
         }
 
    };</script>
