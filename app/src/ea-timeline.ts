@@ -38,11 +38,10 @@ module EA {
         set mainBarHeight(height: number) {
             this._mainBarHeight = height;
         }
-        spacing: number = 2;
+        spacing = 2;
 
-        //timewindow: number = 24;
-        focusMargin: number = 35;
-        contextHeight: number = 60;
+        focusMargin = 35;
+        contextHeight = 60;
         tip: any;
         focusExtent: [Date, Date] = [d3.time.hour.offset(new Date(), -1 * 24), d3.time.hour.offset(new Date(), 0)];
         contextExtent: [Date, Date] = [d3.time.day.offset(new Date(), -5), new Date()];

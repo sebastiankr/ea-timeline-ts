@@ -40,10 +40,21 @@ gulp.task('watch', function () {
 
 gulp.task('build', ['copy:html', 'compile:typescript']);
 gulp.task('compile:typescript', function () {
+<<<<<<< HEAD
   var tsResult = tsProject.src() // instead of gulp.src(...)
     .pipe(ts(tsProject));
 
   return tsResult.js.pipe(gulp.dest(paths.tscripts.dest));
+=======
+  return gulp
+    .src(paths.tscripts.src)
+    .pipe(tsc({
+      module: "commonjs",
+      emitError: false
+    }))
+    .pipe(gulp.dest(paths.tscripts.dest))
+    .pipe(browserSync.stream());
+>>>>>>> d4d13f6d71d8fcf5f1f81abaaf7a90ea52f6d0f0
 });
 
 gulp.task('copy:html', function () {
@@ -66,6 +77,7 @@ gulp.task('lint:default', function () {
 
 // ** Static Web Server ** //
 
+<<<<<<< HEAD
 gulp.task('serve', ['build'], function () {
   browserSync.init({
     server: {
@@ -75,6 +87,17 @@ gulp.task('serve', ['build'], function () {
 
   gulp.watch(paths.tscripts.src + '**/*.ts', ['ts-watch']);
   gulp.watch(paths.html.src, ['html-watch']);
+=======
+gulp.task('serve', ['build'], function() {
+    browserSync.init({
+        server: {
+            baseDir: paths.html.dest
+        }
+    });
+    
+    gulp.watch(paths.tscripts.src, ['ts-watch']);
+    gulp.watch(paths.html.src, ['html-watch']).on('change', browserSync.reload);
+>>>>>>> d4d13f6d71d8fcf5f1f81abaaf7a90ea52f6d0f0
 });
 gulp.task('ts-watch', ['compile:typescript'], browserSync.reload);
 gulp.task('html-watch', ['copy:html'], browserSync.reload);
