@@ -43,8 +43,8 @@ module EA {
         focusMargin = 35;
         contextHeight = 60;
         tip: any;
-        focusExtent: [Date, Date] = [d3.time.hour.offset(new Date(), -1 * 24), d3.time.hour.offset(new Date(), 0)];
-        contextExtent: [Date, Date] = [d3.time.day.offset(new Date(), -5), new Date()];
+        focusExtent = [d3.time.hour.offset(new Date(), -1 * 24), d3.time.hour.offset(new Date(), 0)];
+        contextExtent= [d3.time.day.offset(new Date(), -5), new Date()];
 
         constructor(element, data: Array<TimelineValue> = []) {
             var self = this;
@@ -228,7 +228,7 @@ module EA {
                 }));
 
             funct.attr('transform', (d: TimelineValue) => {
-                return 'translate(' + self.x(d.startTime) + ',0)'
+                return 'translate(' + self.x(d.startTime) + ',1)'
             })
                 .attr('class', (d: TimelineValue) => {
                     var cls = 'function';
@@ -298,7 +298,7 @@ module EA {
             this.xBrush.domain(this.contextExtent);
 
             this.chart.selectAll('rect.function')
-                .attr('transform', (d) => { return 'translate(' + this.x(d.startTime) + ',0)' })
+                .attr('transform', (d) => { return 'translate(' + this.x(d.startTime) + ',1)' })
                 .attr('width', (d) => {
                     return this.calculateWidth(d, this.x);
                 });
