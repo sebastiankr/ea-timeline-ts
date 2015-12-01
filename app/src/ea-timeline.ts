@@ -1,195 +1,166 @@
 /// <reference path="../../typings/tsd.d.ts" />
 /// <reference path="tsd.missing.d.ts" />
 
-module EA {
+module ea {
+    "use strict"
+    
     export interface TimelineValue {
         name: string;
         startTime: Date;
         endTime: Date;
         status: string;
     }
-    export class Timeline {
-        'use strict';
-        element: d3.Selection<HTMLElement>;
-        data: Array<any>;
-        width: number;
-        margin: any;
 
-        x: d3.time.Scale<any, any>;
-        xBrush: d3.time.Scale<any, any>;
+    export function timeline(spec) {
+        let element = spec.element;
+        let data = spec.data;
+        let spacing = 2;
+        let focusMargin = 35;
+        let _mainBarHeight = 40;
 
-        xAxis: d3.svg.Axis;
-        xAxis2: d3.svg.Axis;
-        xAxisBrush: d3.svg.Axis;
+        let focusExtent = [d3.time.hour.offset(new Date(), -1 * 24), d3.time.hour.offset(new Date(), 0)];
+        let contextExtent = [d3.time.day.offset(new Date(), -5), new Date()];
 
-        y: d3.scale.Ordinal<String, any>;
-        yAxis: d3.svg.Axis;
-
-        svg: d3.Selection<HTMLElement>;
-        chart: d3.Selection<HTMLElement>;
-        context: d3.Selection<HTMLElement>;
-
-        brush: d3.svg.Brush<any>;
-
-        private _mainBarHeight: number = 40;
-        get mainBarHeight(): number {
-            return this._mainBarHeight;
+        let margin = { top: 30, right: 20, bottom: 30, left: 100 };
+        let width = parseInt(element.style('width'), 10) - margin.left - margin.right;
+        if (!width) {
+            width = 100;
         }
-        set mainBarHeight(height: number) {
-            this._mainBarHeight = height;
-        }
-        spacing = 2;
+        let height = 200; // placeholder
+        let contextHeight = 100;
+        //var barHeight = 40;
 
-        focusMargin = 35;
-        contextHeight = 60;
-        tip: any;
-        focusExtent = [d3.time.hour.offset(new Date(), -1 * 24), d3.time.hour.offset(new Date(), 0)];
-        contextExtent= [d3.time.day.offset(new Date(), -5), new Date()];
-
-        constructor(element, data: Array<TimelineValue> = []) {
-            var self = this;
-            this.element = element;
-            this.data = data;
-
-            this.margin = { top: 30, right: 20, bottom: 30, left: 100 };
-            this.width = parseInt(this.element.style('width'), 10) - this.margin.left - this.margin.right;
-            if (!this.width) {
-                this.width = 100;
-            }
-            var height = 200; // placeholder
-            var contextHeight = 100;
-            //var barHeight = 40;
-
-            var percent = d3.format('%');
+        let percent = d3.format('%');
         
-            // scales and axes
-            this.x = d3.time.scale()
-                .clamp(true)
-                .domain(this.focusExtent)
-                .range([0, this.width]);
+        // scales and axes
+        let x = d3.time.scale()
+            .clamp(true)
+            .domain(focusExtent)
+            .range([0, width]);
 
-            this.xBrush = d3.time.scale()
-                .clamp(true)
-                .domain(this.contextExtent)
-                .range([0, this.width]);
+        let xBrush = d3.time.scale()
+            .clamp(true)
+            .domain(contextExtent)
+            .range([0, width]);
 
-            this.brush = d3.svg.brush()
-                .x(this.xBrush)
-                .extent(this.focusExtent)
-                .on("brush", () => {
-                    if (!this.brush.empty()) {
-                        var extent: [Date, Date] = this.brush.extent();
-                        var now = new Date();
-                        if (extent[1] > now) {
-                            extent[1] = now;
-                        }
-                        this.focusExtent = extent;
-                        this.x.domain(extent);
-                        this.moveTimescale();
+        let brush = d3.svg.brush()
+            .x(xBrush)
+            .extent(focusExtent)
+            .on("brush", () => {
+                if (!brush.empty()) {
+                    var extent: [Date, Date] = brush.extent();
+                    var now = new Date();
+                    if (extent[1] > now) {
+                        extent[1] = now;
                     }
-                });
+                    focusExtent = extent;
+                    x.domain(extent);
+                    moveTimescale();
+                }
+            });
 
-            this.y = d3.scale.ordinal();
-            this.yAxis = d3.svg.axis();
+        let y = d3.scale.ordinal();
+        let yAxis = d3.svg.axis();
 
-            this.xAxis = d3.svg.axis()
-                .scale(this.x);
+        let xAxis = d3.svg.axis()
+            .scale(x);
 
-            this.xAxis2 = d3.svg.axis()
-                .scale(this.x)
-                .ticks(d3.time.hours, 8)
-            //.tickFormat(d3.time.format("%H:%M"));
-            this.xAxisBrush = d3.svg.axis()
-                .scale(this.xBrush);
+        let xAxis2 = d3.svg.axis()
+            .scale(x)
+            .ticks(d3.time.hours, 8)
+        //.tickFormat(d3.time.format("%H:%M"));
+        let xAxisBrush = d3.svg.axis()
+            .scale(xBrush);
                 
-            // render the chart
-            // create the chart
-            this.svg = this.element.append('svg')
-                .style('width', (this.width + this.margin.left + this.margin.right) + 'px');
-            this.chart = this.svg.append('g')
-                .attr('class', 'focus')
-                .attr('transform', 'translate(' + [this.margin.left, this.margin.top] + ')');
-            // add top and bottom axes
-            this.chart.append('g')
-                .attr('class', 'x axis top');
+        // render the chart
+        // create the chart
+        let svg = element.append('svg')
+            .style('width', (width + margin.left + margin.right) + 'px');
+        let chart = svg.append('g')
+            .attr('class', 'focus')
+            .attr('transform', 'translate(' + [margin.left, margin.top] + ')');
+        // add top and bottom axes
+        chart.append('g')
+            .attr('class', 'x axis top');
 
-            this.chart.append('g')
-                .attr('class', 'x axis bottom')
-                .attr('transform', 'translate(0,' + height + ')');
+        chart.append('g')
+            .attr('class', 'x axis bottom')
+            .attr('transform', 'translate(0,' + height + ')');
             
-            // add y axes
-            this.chart.append("g")
-                .attr("class", "y axis")
-                .attr('transform', 'translate(' + (-1 * this.spacing) + ',' + this.spacing + ')');
+        // add y axes
+        chart.append("g")
+            .attr("class", "y axis")
+            .attr('transform', 'translate(' + (-1 * spacing) + ',' + spacing + ')');
 
-            // render the brush
-            // add top and bottom axes
-            this.context = this.svg.append('g')
-                .attr('class', 'context')
-                .attr('transform', 'translate(' + [this.margin.left, 0] + ')');
+        // render the brush
+        // add top and bottom axes
+        let context = svg.append('g')
+            .attr('class', 'context')
+            .attr('transform', 'translate(' + [margin.left, 0] + ')');
 
-            this.context.append('g')
-                .attr('class', 'x axis context bottom')
-                .attr('transform', 'translate(0,' + height + ')');
+        context.append('g')
+            .attr('class', 'x axis context bottom')
+            .attr('transform', 'translate(0,' + height + ')');
 
-            this.context.append("g")
-                .attr("class", "x brush")
-                .call(this.brush)
-                .selectAll("rect")
-                .attr("y", -6)
-                .attr("height", this.contextHeight + 5);
+        context.append("g")
+            .attr("class", "x brush")
+            .call(brush)
+            .selectAll("rect")
+            .attr("y", -6)
+            .attr("height", contextHeight + 5);
 
-            var intervalID = window.setInterval(() => { this.moveTimescale() }, 1000);
+        let tip = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-10, 0])
+            .html(function(d) {
+                var tooltip = '<strong class="value">' + d.name
+                // + '</strong><br> <span>' + moment(d.startTime).calendar() + ' &ndash; ' + moment(d.endTime).calendar() + '</span>'
+                    + '</span><br> <span>' + moment(d.startTime).format('h:mm:ss a') + ' &ndash; ' + moment(d.endTime).format('h:mm:ss a')
+                    + '<br> (' + moment.duration(moment(d.endTime).diff(d.startTime)).format("d[d] h [hrs], m [min], s [sec]") + ')</span>';
+                return tooltip;
+            });
 
-            this.tip = d3.tip()
-                .attr('class', 'd3-tip')
-                .offset([-10, 0])
-                .html(function(d) {
-                    var tooltip = '<strong class="value">' + d.name
-                    // + '</strong><br> <span>' + moment(d.startTime).calendar() + ' &ndash; ' + moment(d.endTime).calendar() + '</span>'
-                        + '</span><br> <span>' + moment(d.startTime).format('h:mm:ss a') + ' &ndash; ' + moment(d.endTime).format('h:mm:ss a')
-                        + '<br> (' + moment.duration(moment(d.endTime).diff(d.startTime)).format("d[d] h [hrs], m [min], s [sec]") + ')</span>';
-                    return tooltip;
-                });
+        chart.call(tip);
+        var calculateWidth = function(d, xa) {
+            var width = 0;
+            if (!d.endTime)
+                width = xa(new Date()) - xa(d.startTime);
+            else if (d.startTime)
+                width = xa(d.endTime) - xa(d.startTime);
+            if (width > 0 && width < 1)
+                width = 1;
+            return width;
+        };  
+        // UPDATE
+        var update = function(d: Array<TimelineValue>) {
 
-            this.chart.call(this.tip);
-            this.update(this.data);
-        }
-
-        zoom(ms: number) {
-            this.focusExtent[0] = new Date(this.focusExtent[1].getTime() - ms);
-            this.moveTimescale();
-        }
-
-        update(data: Array<any>) {
-            var self = this;
-            this.data = data;
+            let data = d;
             var height: number;
 
-            this.y
+            y
                 .domain(data.map(function(d) { return d.key; }))
-                .rangeBands([0, data.length * this._mainBarHeight]);
-            this.yAxis.scale(this.y);
-            this.chart.select('.y.axis').call(this.yAxis.orient('left'));
-        
+                .rangeBands([0, data.length * _mainBarHeight]);
+            yAxis.scale(y);
+            chart.select('.y.axis').call(yAxis.orient('left'));
+            //TODO xAxisi missing
             // set height based on data
-            height = this.y.rangeExtent()[1];
-            d3.select(this.chart.node().parentNode)
-                .style('height', (height + this.margin.top + this.focusMargin + this.contextHeight + this.margin.bottom) + 'px')
+            height = y.rangeExtent()[1];
+            d3.select(chart.node().parentNode)
+                .style('height', (height + margin.top + focusMargin + contextHeight + margin.bottom) + 'px')
 
-            this.svg.select('.context').attr('transform', () => {
-                return 'translate(' + [this.margin.left, height + this.margin.top + this.focusMargin] + ')';
+            svg.select('.context').attr('transform', () => {
+                return 'translate(' + [margin.left, height + margin.top + focusMargin] + ')';
             });
 
-            this.chart.select('.x.axis.bottom').attr('transform', () => {
-                return 'translate(0,' + (height + 2 * this.spacing) + ')';
+            chart.select('.x.axis.bottom').attr('transform', () => {
+                return 'translate(0,' + (height + 2 * spacing) + ')';
             });
 
-            this.context.select('.x.axis.context.bottom').attr('transform', () => {
-                return 'translate(0,' + this.contextHeight + ')';
+            context.select('.x.axis.context.bottom').attr('transform', () => {
+                return 'translate(0,' + contextHeight + ')';
             });
 
-            var bars = this.chart.selectAll('.bar')
+            let bars = chart.selectAll('.bar')
                 .data(data, (d) => { return d.key; });
 
             bars.enter()
@@ -197,24 +168,24 @@ module EA {
                 .attr('class', 'bar')
                 .append('rect')
                 .attr('class', 'background')
-                .attr('height', this.y.rangeBand())
-                .attr('width', this.width);
+                .attr('height', y.rangeBand())
+                .attr('width', width);
 
             bars.attr('transform', (d, i) => {
-                var index: number = d3.map(data, (d) => { return d.key; }).keys().indexOf(d.key);
-                return 'translate(0,' + (index * this._mainBarHeight + this.spacing) + ')';
+                let index = d3.map(data, (d) => { return d.key; }).keys().indexOf(d.key);
+                return 'translate(0,' + (index * _mainBarHeight + spacing) + ')';
             });
 
-            var funct = bars.selectAll('rect.function')
+            let funct = bars.selectAll('rect.function')
                 .data((d) => {
                     return (d.values) ? d.values : [];
                 });
 
             funct.enter().append('rect')
-                .on('mouseover', this.tip.show)
-                .on('mouseout', this.tip.hide)
+                .on('mouseover', tip.show)
+                .on('mouseout', tip.hide)
                 .on('contextmenu', d3.contextMenu(function(data) {
-                    var menu = [];
+                    let menu = [];
                     if (data.docLink) {
                         menu.push({
                             title: '<core-icon icon="help" self-center></core-icon>Documentation',
@@ -228,37 +199,37 @@ module EA {
                 }));
 
             funct.attr('transform', (d: TimelineValue) => {
-                return 'translate(' + self.x(d.startTime) + ',1)'
+                return 'translate(' + x(d.startTime) + ',0)'
             })
                 .attr('class', (d: TimelineValue) => {
-                    var cls = 'function';
+                    let cls = 'function';
                     if (!d.endTime)
                         cls += ' running';
                     if (d.status)
                         cls += ' status' + d.status;
                     return cls;
                 })
-                .attr('height', self.y.rangeBand())
-                .attr('width', (d) => {
-                    return this.calculateWidth(d, this.x);
+                .attr('height', y.rangeBand())
+                .attr('width', function(d) {
+                    return calculateWidth(d, x);
                 });
 
             funct.exit().remove();
 
             bars.exit().remove();
 
-            var contextbars = this.context.selectAll('.bar')
+            let contextbars = context.selectAll('.bar')
                 .data(data, (d) => { return d.key; });
 
             contextbars.enter()
                 .insert('g', ":first-child")
                 .attr('class', 'bar');
             contextbars.attr('transform', (d, i) => {
-                var barHeight = this.contextHeight / data.length;
+                let barHeight = contextHeight / data.length;
                 return 'translate(0,' + i * barHeight + ')';
             })
 
-            var contextFunct = contextbars.selectAll('rect.function')
+            let contextFunct = contextbars.selectAll('rect.function')
                 .data((d) => {
                     return (d.values) ? d.values : [];
                 });
@@ -266,19 +237,19 @@ module EA {
             contextFunct.enter().append('rect');
 
             contextFunct.attr('transform', (d: TimelineValue) => {
-                return 'translate(' + self.xBrush(d.startTime) + ',0)'
+                return 'translate(' + xBrush(d.startTime) + ',0)'
             })
                 .attr('class', (d: TimelineValue) => {
-                    var cls = 'function';
+                    let cls = 'function';
                     if (!d.endTime)
                         cls += ' running';
                     if (d.status)
                         cls += ' status' + d.status;
                     return cls;
                 })
-                .attr('height', this.contextHeight / data.length)
+                .attr('height', contextHeight / data.length)
                 .attr('width', (d) => {
-                    return this.calculateWidth(d, this.xBrush);
+                    return calculateWidth(d, xBrush);
                 });
 
             contextbars.exit().remove();
@@ -286,82 +257,78 @@ module EA {
 
         }
 
-        moveTimescale() {
+        update(data);
+
+        var moveTimescale = function() {
             // prevent moving into the future
-            var moveByInMilli: number = (new Date()).getTime() - this.contextExtent[1].getTime();
-            this.focusExtent[0] = new Date(this.focusExtent[0].getTime() + moveByInMilli);
-            this.focusExtent[1] = new Date(this.focusExtent[1].getTime() + moveByInMilli);
-            this.contextExtent[0] = new Date(this.contextExtent[0].getTime() + moveByInMilli);
-            this.contextExtent[1] = new Date(this.contextExtent[1].getTime() + moveByInMilli);
+            let moveByInMilli: number = (new Date()).getTime() - contextExtent[1].getTime();
+            focusExtent[0] = new Date(focusExtent[0].getTime() + moveByInMilli);
+            focusExtent[1] = new Date(focusExtent[1].getTime() + moveByInMilli);
+            contextExtent[0] = new Date(contextExtent[0].getTime() + moveByInMilli);
+            contextExtent[1] = new Date(contextExtent[1].getTime() + moveByInMilli);
 
-            this.x.domain(this.focusExtent);
-            this.xBrush.domain(this.contextExtent);
+            x.domain(focusExtent);
+            xBrush.domain(contextExtent);
 
-            this.chart.selectAll('rect.function')
-                .attr('transform', (d) => { return 'translate(' + this.x(d.startTime) + ',1)' })
+            chart.selectAll('rect.function')
+                .attr('transform', (d) => { return 'translate(' + x(d.startTime) + ',0)' })
                 .attr('width', (d) => {
-                    return this.calculateWidth(d, this.x);
+                    return calculateWidth(d, x);
                 });
 
-            this.context.selectAll('rect.function')
-                .attr('transform', (d) => { return 'translate(' + this.xBrush(d.startTime) + ',0)' })
+            context.selectAll('rect.function')
+                .attr('transform', (d) => { return 'translate(' + xBrush(d.startTime) + ',0)' })
                 .attr('width', (d) => {
-                    return this.calculateWidth(d, this.xBrush);
+                    return calculateWidth(d, xBrush);
                 });         
             // update axes
-            this.chart.select('.x.axis.top').call(this.xAxis.orient('top'));
-            this.chart.select('.x.axis.bottom').call(this.xAxis2.orient('bottom'));
-            this.context.select('.x.axis.context.bottom').call(this.xAxisBrush.orient('bottom'));
-            this.context.select('.x.brush').call(this.brush.extent(this.focusExtent));
+            chart.select('.x.axis.top').call(xAxis.orient('top'));
+            chart.select('.x.axis.bottom').call(xAxis2.orient('bottom'));
+            context.select('.x.axis.context.bottom').call(xAxisBrush.orient('bottom'));
+            context.select('.x.brush').call(brush.extent(focusExtent));
         }
 
-        resize() {
+        let resize = function() {
         
             // update width
-            this.width = parseInt(this.element.style('width'), 10);
-            this.width = this.width - this.margin.left - this.margin.right;
+            width = parseInt(element.style('width'), 10);
+            width = width - margin.left - margin.right;
  
             // resize the chart
-            this.x.range([0, this.width]);
-            this.xBrush.range([0, this.width]);
+            x.range([0, width]);
+            xBrush.range([0, width]);
             //this.brush.clear();
             
-            d3.select(this.chart.node().parentNode)
+            d3.select(chart.node().parentNode)
             //.style('height', (this.y.rangeExtent()[1] + this.margin.top + this.margin.bottom + 300) + 'px')
-                .style('width', (this.width + (this.margin).left + this.margin.right) + 'px');
+                .style('width', (width + margin.left + margin.right) + 'px');
 
-            this.chart.selectAll('rect.background')
-                .attr('width', this.width);
+            chart.selectAll('rect.background')
+                .attr('width', width);
 
-            this.chart.selectAll('rect.function')
-                .attr('transform', (d) => { return 'translate(' + this.x(d.startTime) + ',0)' })
+            chart.selectAll('rect.function')
+                .attr('transform', (d) => { return 'translate(' + x(d.startTime) + ',0)' })
                 .attr('width', (d) => {
-                    return this.calculateWidth(d, this.x);
+                    return calculateWidth(d, x);
                 });
 
-            this.context.selectAll('rect.function')
-                .attr('transform', (d) => { return 'translate(' + this.xBrush(d.startTime) + ',0)' })
+            context.selectAll('rect.function')
+                .attr('transform', (d) => { return 'translate(' + xBrush(d.startTime) + ',0)' })
                 .attr('width', (d) => {
-                    return this.calculateWidth(d, this.xBrush);
+                    return calculateWidth(d, xBrush);
                 });           
             // update axes
-            this.chart.select('.x.axis.top').call(this.xAxis.orient('top'));
-            this.chart.select('.x.axis.bottom').call(this.xAxis2.orient('bottom'));
-            this.context.select('.x.axis.context.bottom').call(this.xAxisBrush.orient('bottom'));
-            this.context.select('.x.brush').call(this.brush.extent(this.focusExtent));
+            chart.select('.x.axis.top').call(xAxis.orient('top'));
+            chart.select('.x.axis.bottom').call(xAxis2.orient('bottom'));
+            context.select('.x.axis.context.bottom').call(xAxisBrush.orient('bottom'));
+            context.select('.x.brush').call(brush.extent(focusExtent));
         }
 
-        calculateWidth = function(d, xa) {
-            var width: number = 0;
-            if (!d.endTime)
-                width = xa(new Date()) - xa(d.startTime);
-            else if (d.startTime)
-                width = xa(d.endTime) - xa(d.startTime);
-            if (width > 0 && width < 1)
-                width = 1;
-            return width;
-        };
+        var intervalID = window.setInterval(() => { moveTimescale() }, 1000);
+
+        return Object.freeze({
+            resize,
+            update
+        });
     }
 }
-
-this.EA = EA;
