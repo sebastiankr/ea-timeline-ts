@@ -1,6 +1,5 @@
 var gulp = require('gulp');
 var ts = require('gulp-typescript');
-var tsc = require('gulp-tsc');
 var shell = require('gulp-shell');
 var runseq = require('run-sequence');
 var tslint = require('gulp-tslint');

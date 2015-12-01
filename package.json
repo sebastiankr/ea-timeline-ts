@@ -5,11 +5,11 @@
   "devDependencies": {
     "browser-sync": "^2.10.0",
     "gulp": "^3.6.2",
-    "gulp-shell": "^0.4.2",
+    "gulp-shell": "^0.5.1",
     "gulp-typescript": "^2.9.2",
-    "gulp-tslint": "^2.0.0",
-    "mocha": "*",
-    "run-sequence": "^1.1.1"
+    "gulp-tslint": "^4.1.0",
+    "mocha": "^2.3.4",
+    "run-sequence": "^1.1.5"
   },
   "scripts": {
     "main": "gulp buildrun",
