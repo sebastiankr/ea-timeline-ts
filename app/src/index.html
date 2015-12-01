@@ -78,8 +78,7 @@ window.onload = function runD3code() {
         var nestBykey = d3.nest().key(function (d) { return d.key });
         var d = nestBykey.entries(data);
        
-        var timelinechart = d3.select('#chart');
-        var t = EA.timel({
+        var t = ea.timeline({
           element: d3.select('#chart'),
           data: d
         });
