@@ -1,8 +1,9 @@
 # ea-timeline-ts
 
+[![devDependency Status](https://david-dm.org/sebastiankr/ea-timeline-ts/dev-status.svg)](https://david-dm.org/sebastiankr/ea-timeline-ts#info=devDependencies)
+
 Reactive timeline/gantt chart using D3 written in typescript.
 
-<!--[Demo](http://sebastian.kropponline.de/)-->
 ## Features
 
 - Easy to update with new data
