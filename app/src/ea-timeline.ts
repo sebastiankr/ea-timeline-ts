@@ -2,8 +2,8 @@
 /// <reference path="tsd.missing.d.ts" />
 
 module ea {
-    "use strict"
-    
+    'use strict';
+
     export interface TimelineValue {
         name: string;
         startTime: Date;
@@ -31,7 +31,7 @@ module ea {
         //var barHeight = 40;
 
         let percent = d3.format('%');
-        
+
         // scales and axes
         let x = d3.time.scale()
             .clamp(true)
@@ -46,7 +46,7 @@ module ea {
         let brush = d3.svg.brush()
             .x(xBrush)
             .extent(focusExtent)
-            .on("brush", () => {
+            .on('brush', () => {
                 if (!brush.empty()) {
                     var extent: [Date, Date] = brush.extent();
                     var now = new Date();
@@ -71,7 +71,7 @@ module ea {
         //.tickFormat(d3.time.format("%H:%M"));
         let xAxisBrush = d3.svg.axis()
             .scale(xBrush);
-                
+
         // render the chart
         // create the chart
         let svg = element.append('svg')
@@ -88,8 +88,8 @@ module ea {
             .attr('transform', 'translate(0,' + height + ')');
             
         // add y axes
-        chart.append("g")
-            .attr("class", "y axis")
+        chart.append('g')
+            .attr('class', 'y axis')
             .attr('transform', 'translate(' + (-1 * spacing) + ',' + spacing + ')');
 
         // render the brush
@@ -102,12 +102,12 @@ module ea {
             .attr('class', 'x axis context bottom')
             .attr('transform', 'translate(0,' + height + ')');
 
-        context.append("g")
-            .attr("class", "x brush")
+        context.append('g')
+            .attr('class', 'x brush')
             .call(brush)
-            .selectAll("rect")
-            .attr("y", -6)
-            .attr("height", contextHeight + 5);
+            .selectAll('rect')
+            .attr('y', -6)
+            .attr('height', contextHeight + 5);
 
         let tip = d3.tip()
             .attr('class', 'd3-tip')
@@ -116,7 +116,7 @@ module ea {
                 var tooltip = '<strong class="value">' + d.name
                 // + '</strong><br> <span>' + moment(d.startTime).calendar() + ' &ndash; ' + moment(d.endTime).calendar() + '</span>'
                     + '</span><br> <span>' + moment(d.startTime).format('h:mm:ss a') + ' &ndash; ' + moment(d.endTime).format('h:mm:ss a')
-                    + '<br> (' + moment.duration(moment(d.endTime).diff(d.startTime)).format("d[d] h [hrs], m [min], s [sec]") + ')</span>';
+                    + '<br> (' + moment.duration(moment(d.endTime).diff(d.startTime)).format('d[d] h [hrs], m [min], s [sec]') + ')</span>';
                 return tooltip;
             });
 
@@ -222,7 +222,7 @@ module ea {
                 .data(data, (d) => { return d.key; });
 
             contextbars.enter()
-                .insert('g', ":first-child")
+                .insert('g', ':first-child')
                 .attr('class', 'bar');
             contextbars.attr('transform', (d, i) => {
                 let barHeight = contextHeight / data.length;
