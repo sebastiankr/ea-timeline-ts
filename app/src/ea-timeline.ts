@@ -92,6 +92,22 @@ module ea {
             .attr('class', 'y axis')
             .attr('transform', 'translate(' + (-1 * spacing) + ',' + spacing + ')');
 
+
+        function resizePath(d) {
+            var e = +(d == "e"),
+                x = e ? 1 : -1,
+                y = height / 3;
+            return "M" + (.5 * x) + "," + y
+                + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6)
+                + "V" + (2 * y - 6)
+                + "A6,6 0 0 " + e + " " + (.5 * x) + "," + (2 * y)
+                + "Z"
+                + "M" + (2.5 * x) + "," + (y + 8)
+                + "V" + (2 * y - 8)
+                + "M" + (4.5 * x) + "," + (y + 8)
+                + "V" + (2 * y - 8);
+        }
+
         // render the brush
         // add top and bottom axes
         let context = svg.append('g')
@@ -108,6 +124,10 @@ module ea {
             .selectAll('rect')
             .attr('y', -6)
             .attr('height', contextHeight + 5);
+         
+        context.select('.resize.e').append("path").attr("d", resizePath);
+        context.select('.resize.w').append("path").attr("d", resizePath);
+        
 
         let tip = d3.tip()
             .attr('class', 'd3-tip')

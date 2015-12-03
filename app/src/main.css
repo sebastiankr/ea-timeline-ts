@@ -336,4 +336,10 @@ paper-shadow {
   } 
 }
 
+
+.brush .resize path {
+  fill: #eee;
+  stroke: #666;
+}
+
 /*# sourceMappingURL=main.css.map */
