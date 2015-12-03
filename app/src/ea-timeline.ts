@@ -86,7 +86,7 @@ module ea {
         chart.append('g')
             .attr('class', 'x axis bottom')
             .attr('transform', 'translate(0,' + height + ')');
-            
+
         // add y axes
         chart.append('g')
             .attr('class', 'y axis')
@@ -131,7 +131,7 @@ module ea {
                 width = 1;
             }
             return width;
-        };  
+        };
         // UPDATE
         var update = function(d: Array<TimelineValue>) {
 
@@ -285,7 +285,7 @@ module ea {
                 .attr('transform', (d) => { return 'translate(' + xBrush(d.startTime) + ',0)' })
                 .attr('width', (d) => {
                     return calculateWidth(d, xBrush);
-                });         
+                });
             // update axes
             chart.select('.x.axis.top').call(xAxis.orient('top'));
             chart.select('.x.axis.bottom').call(xAxis2.orient('bottom'));
@@ -294,16 +294,16 @@ module ea {
         }
 
         let resize = function() {
-        
+
             // update width
             width = parseInt(element.style('width'), 10);
             width = width - margin.left - margin.right;
- 
+
             // resize the chart
             x.range([0, width]);
             xBrush.range([0, width]);
             //this.brush.clear();
-            
+
             d3.select(chart.node().parentNode)
             //.style('height', (this.y.rangeExtent()[1] + this.margin.top + this.margin.bottom + 300) + 'px')
                 .style('width', (width + margin.left + margin.right) + 'px');
@@ -321,7 +321,7 @@ module ea {
                 .attr('transform', (d) => { return 'translate(' + xBrush(d.startTime) + ',0)' })
                 .attr('width', (d) => {
                     return calculateWidth(d, xBrush);
-                });           
+                });
             // update axes
             chart.select('.x.axis.top').call(xAxis.orient('top'));
             chart.select('.x.axis.bottom').call(xAxis2.orient('bottom'));
