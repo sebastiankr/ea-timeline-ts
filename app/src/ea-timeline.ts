@@ -123,12 +123,13 @@ module ea {
         chart.call(tip);
         var calculateWidth = function(d, xa) {
             var width = 0;
-            if (!d.endTime)
+            if (!d.endTime) {
                 width = xa(new Date()) - xa(d.startTime);
-            else if (d.startTime)
+            } else if (d.startTime) {
                 width = xa(d.endTime) - xa(d.startTime);
-            if (width > 0 && width < 1)
+            } if (width > 0 && width < 1) {
                 width = 1;
+            }
             return width;
         };  
         // UPDATE
@@ -203,10 +204,13 @@ module ea {
             })
                 .attr('class', (d: TimelineValue) => {
                     let cls = 'function';
-                    if (!d.endTime)
+                    if (!d.endTime) {
                         cls += ' running';
-                    if (d.status)
+                    }
+                    if (d.status) {
                         cls += ' status' + d.status;
+                    }
+
                     return cls;
                 })
                 .attr('height', y.rangeBand())
@@ -241,10 +245,12 @@ module ea {
             })
                 .attr('class', (d: TimelineValue) => {
                     let cls = 'function';
-                    if (!d.endTime)
+                    if (!d.endTime) {
                         cls += ' running';
-                    if (d.status)
+                    }
+                    if (d.status) {
                         cls += ' status' + d.status;
+                    }
                     return cls;
                 })
                 .attr('height', contextHeight / data.length)
@@ -254,7 +260,6 @@ module ea {
 
             contextbars.exit().remove();
             contextFunct.exit().remove();
-
         }
 
         update(data);
