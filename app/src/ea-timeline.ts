@@ -216,7 +216,9 @@ module ea {
                 .attr('height', y.rangeBand())
                 .attr('width', function(d) {
                     return calculateWidth(d, x);
-                });
+                })
+                .attr('rx',4)
+                .attr('ry',4);  
 
             funct.exit().remove();
 
@@ -285,7 +287,9 @@ module ea {
                 .attr('transform', (d) => { return 'translate(' + xBrush(d.startTime) + ',0)' })
                 .attr('width', (d) => {
                     return calculateWidth(d, xBrush);
-                });
+                })
+                .attr('rx',4)
+                .attr('ry',4);  
             // update axes
             chart.select('.x.axis.top').call(xAxis.orient('top'));
             chart.select('.x.axis.bottom').call(xAxis2.orient('bottom'));
