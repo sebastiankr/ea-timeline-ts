@@ -96,7 +96,7 @@ module ea {
         function resizePath(d) {
             var e = +(d == "e"),
                 x = e ? 1 : -1,
-                y = height / 3;
+                y = contextHeight / 3;
             return "M" + (.5 * x) + "," + y
                 + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6)
                 + "V" + (2 * y - 6)
