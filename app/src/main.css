@@ -340,6 +340,7 @@ paper-shadow {
 .brush .resize path {
   fill: #eee;
   stroke: #666;
+  opacity: 0.5;
 }
 
 /*# sourceMappingURL=main.css.map */
