@@ -92,6 +92,21 @@ module ea {
             .attr('class', 'y axis')
             .attr('transform', 'translate(' + (-1 * spacing) + ',' + spacing + ')');
 
+        let resizeHandlePath = function resizeHandlePath(d) {
+            var e = +(d == 'e'),
+                x = e ? 1 : -1,
+                y = contextHeight / 3;
+            return 'M' + (.5 * x) + ',' + y
+                + 'A6,6 0 0 ' + e + ' ' + (6.5 * x) + ',' + (y + 6)
+                + 'V' + (2 * y - 6)
+                + 'A6,6 0 0 ' + e + ' ' + (.5 * x) + ',' + (2 * y)
+                + 'Z'
+                + 'M' + (2.5 * x) + ',' + (y + 8)
+                + 'V' + (2 * y - 8)
+                + 'M' + (4.5 * x) + ',' + (y + 8)
+                + 'V' + (2 * y - 8);
+        }
+
         // render the brush
         // add top and bottom axes
         let context = svg.append('g')
@@ -109,11 +124,14 @@ module ea {
             .attr('y', -6)
             .attr('height', contextHeight + 5);
 
+        context.select('.resize.e').append('path').attr('d', resizeHandlePath);
+        context.select('.resize.w').append('path').attr('d', resizeHandlePath);
+
         let tip = d3.tip()
             .attr('class', 'd3-tip')
             .offset([-10, 0])
             .html(function(d) {
-                var tooltip = '<strong class="value">' + d.name
+                var tooltip = '<strong class='value'>' + d.name
                 // + '</strong><br> <span>' + moment(d.startTime).calendar() + ' &ndash; ' + moment(d.endTime).calendar() + '</span>'
                     + '</span><br> <span>' + moment(d.startTime).format('h:mm:ss a') + ' &ndash; ' + moment(d.endTime).format('h:mm:ss a')
                     + '<br> (' + moment.duration(moment(d.endTime).diff(d.startTime)).format('d[d] h [hrs], m [min], s [sec]') + ')</span>';
@@ -260,7 +278,7 @@ module ea {
 
             contextbars.exit().remove();
             contextFunct.exit().remove();
-        }
+        };
 
         update(data);
 
