@@ -4,7 +4,12 @@
 module ea {
     'use strict';
 
-    export interface TimelineValue {
+    export interface TimelineProcess {
+        key: string;
+        values: TimelineTask;
+    }
+
+    export interface TimelineTask {
         name: string;
         startTime: Date;
         endTime: Date;
@@ -67,7 +72,7 @@ module ea {
 
         let xAxis2 = d3.svg.axis()
             .scale(x)
-            .ticks(d3.time.hours, 8)
+            .ticks(d3.time.hours, 8);
         //.tickFormat(d3.time.format("%H:%M"));
         let xAxisBrush = d3.svg.axis()
             .scale(xBrush);
@@ -93,7 +98,7 @@ module ea {
             .attr('transform', 'translate(' + (-1 * spacing) + ',' + spacing + ')');
 
         let resizeHandlePath = function resizeHandlePath(d) {
-            var e = +(d == 'e'),
+            var e = +(d === 'e'),
                 x = e ? 1 : -1,
                 y = contextHeight / 3;
             return 'M' + (.5 * x) + ',' + y
@@ -105,7 +110,7 @@ module ea {
                 + 'V' + (2 * y - 8)
                 + 'M' + (4.5 * x) + ',' + (y + 8)
                 + 'V' + (2 * y - 8);
-        }
+        };
 
         // render the brush
         // add top and bottom axes
@@ -131,7 +136,7 @@ module ea {
             .attr('class', 'd3-tip')
             .offset([-10, 0])
             .html(function(d) {
-                var tooltip = '<strong class='value'>' + d.name
+                var tooltip = '<strong class="value">' + d.name
                 // + '</strong><br> <span>' + moment(d.startTime).calendar() + ' &ndash; ' + moment(d.endTime).calendar() + '</span>'
                     + '</span><br> <span>' + moment(d.startTime).format('h:mm:ss a') + ' &ndash; ' + moment(d.endTime).format('h:mm:ss a')
                     + '<br> (' + moment.duration(moment(d.endTime).diff(d.startTime)).format('d[d] h [hrs], m [min], s [sec]') + ')</span>';
@@ -151,7 +156,7 @@ module ea {
             return width;
         };
         // UPDATE
-        var update = function(d: Array<TimelineValue>) {
+        var update = function(d: Array<TimelineProcess>) {
 
             let data = d;
             var height: number;
@@ -165,7 +170,7 @@ module ea {
             // set height based on data
             height = y.rangeExtent()[1];
             d3.select(chart.node().parentNode)
-                .style('height', (height + margin.top + focusMargin + contextHeight + margin.bottom) + 'px')
+                .style('height', (height + margin.top + focusMargin + contextHeight + margin.bottom) + 'px');
 
             svg.select('.context').attr('transform', () => {
                 return 'translate(' + [margin.left, height + margin.top + focusMargin] + ')';
@@ -217,10 +222,10 @@ module ea {
                     return menu;
                 }));
 
-            funct.attr('transform', (d: TimelineValue) => {
-                return 'translate(' + x(d.startTime) + ',0)'
+            funct.attr('transform', (d: TimelineTask) => {
+                return 'translate(' + x(d.startTime) + ',0)';
             })
-                .attr('class', (d: TimelineValue) => {
+                .attr('class', (d: TimelineTask) => {
                     let cls = 'function';
                     if (!d.endTime) {
                         cls += ' running';
@@ -249,7 +254,7 @@ module ea {
             contextbars.attr('transform', (d, i) => {
                 let barHeight = contextHeight / data.length;
                 return 'translate(0,' + i * barHeight + ')';
-            })
+            });
 
             let contextFunct = contextbars.selectAll('rect.function')
                 .data((d) => {
@@ -258,10 +263,10 @@ module ea {
 
             contextFunct.enter().append('rect');
 
-            contextFunct.attr('transform', (d: TimelineValue) => {
-                return 'translate(' + xBrush(d.startTime) + ',0)'
+            contextFunct.attr('transform', (d: TimelineTask) => {
+                return 'translate(' + xBrush(d.startTime) + ',0)';
             })
-                .attr('class', (d: TimelineValue) => {
+                .attr('class', (d: TimelineTask) => {
                     let cls = 'function';
                     if (!d.endTime) {
                         cls += ' running';
@@ -282,7 +287,7 @@ module ea {
 
         update(data);
 
-        var moveTimescale = function() {
+        var moveTimescale = function moveTimescale() {
             // prevent moving into the future
             let moveByInMilli: number = (new Date()).getTime() - contextExtent[1].getTime();
             focusExtent[0] = new Date(focusExtent[0].getTime() + moveByInMilli);
@@ -294,13 +299,13 @@ module ea {
             xBrush.domain(contextExtent);
 
             chart.selectAll('rect.function')
-                .attr('transform', (d) => { return 'translate(' + x(d.startTime) + ',0)' })
+                .attr('transform', (d) => { return 'translate(' + x(d.startTime) + ',0)'; })
                 .attr('width', (d) => {
                     return calculateWidth(d, x);
                 });
 
             context.selectAll('rect.function')
-                .attr('transform', (d) => { return 'translate(' + xBrush(d.startTime) + ',0)' })
+                .attr('transform', (d) => { return 'translate(' + xBrush(d.startTime) + ',0)'; })
                 .attr('width', (d) => {
                     return calculateWidth(d, xBrush);
                 });
@@ -309,7 +314,7 @@ module ea {
             chart.select('.x.axis.bottom').call(xAxis2.orient('bottom'));
             context.select('.x.axis.context.bottom').call(xAxisBrush.orient('bottom'));
             context.select('.x.brush').call(brush.extent(focusExtent));
-        }
+        };
 
         let resize = function() {
 
@@ -330,13 +335,13 @@ module ea {
                 .attr('width', width);
 
             chart.selectAll('rect.function')
-                .attr('transform', (d) => { return 'translate(' + x(d.startTime) + ',0)' })
+                .attr('transform', (d) => { return 'translate(' + x(d.startTime) + ',0)'; })
                 .attr('width', (d) => {
                     return calculateWidth(d, x);
                 });
 
             context.selectAll('rect.function')
-                .attr('transform', (d) => { return 'translate(' + xBrush(d.startTime) + ',0)' })
+                .attr('transform', (d) => { return 'translate(' + xBrush(d.startTime) + ',0)'; })
                 .attr('width', (d) => {
                     return calculateWidth(d, xBrush);
                 });
@@ -345,9 +350,9 @@ module ea {
             chart.select('.x.axis.bottom').call(xAxis2.orient('bottom'));
             context.select('.x.axis.context.bottom').call(xAxisBrush.orient('bottom'));
             context.select('.x.brush').call(brush.extent(focusExtent));
-        }
+        };
 
-        var intervalID = window.setInterval(() => { moveTimescale() }, 1000);
+        var intervalID = window.setInterval(() => { moveTimescale(); }, 1000);
 
         return Object.freeze({
             resize,
