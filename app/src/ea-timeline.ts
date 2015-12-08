@@ -286,11 +286,22 @@ module ea {
                 .attr('width', (d) => {
                     return calculateWidth(d, xBrush);
                 });
+                
+
+            
             // update axes
             chart.select('.x.axis.top').call(xAxis.orient('top'));
             chart.select('.x.axis.bottom').call(xAxis2.orient('bottom'));
             context.select('.x.axis.context.bottom').call(xAxisBrush.orient('bottom'));
             context.select('.x.brush').call(brush.extent(focusExtent));
+            animateBlink(d3.select('.focus').selectAll('rect.function'));
+        }
+
+        function animateBlink(runningTasks) {
+            console.log('called animateBlink');
+            runningTasks.transition().duration(1000).delay(0)
+            .style("opacity", runningTasks.style("opacity") == "1" ? ".1" : "1")
+            .each("end", animateBlink);
         }
 
         let resize = function() {
