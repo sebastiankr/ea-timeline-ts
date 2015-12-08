@@ -340,7 +340,9 @@ module ea {
         var intervalID = window.setInterval(() => { moveTimescale() }, 1000);
         
         var intervalID2 = window.setInterval(() => { animateBlink(blinkAnimationDuration) }, blinkAnimationDuration);
-
+        
+        //TODO: Experiment with using Window.requestAnimationFrame() to wrap the calls to moveTimescale and animateBlink
+        
         return Object.freeze({
             resize,
             update
