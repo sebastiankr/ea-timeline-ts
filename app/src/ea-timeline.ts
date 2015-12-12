@@ -316,8 +316,7 @@ module ea {
             context.select('.x.brush').call(brush.extent(focusExtent));
         };
 
-        let resize = function() {
-
+        let resize = function resize() {
             // update width
             width = parseInt(element.style('width'), 10);
             width = width - margin.left - margin.right;
