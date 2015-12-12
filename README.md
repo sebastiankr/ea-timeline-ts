@@ -4,6 +4,8 @@
 
 Reactive timeline/gantt chart using D3 written in typescript.
 
+![alt tag](https://raw.github.com/sebastiankr/ea-timeline-ts/preview.gif)
+
 ## Features
 
 - Easy to update with new data
