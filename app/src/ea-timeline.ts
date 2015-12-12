@@ -157,7 +157,6 @@ module ea {
         };
         // UPDATE
         var update = function(d: Array<TimelineProcess>) {
-
             let data = d;
             var height: number;
 
@@ -309,12 +308,19 @@ module ea {
                 .attr('width', (d) => {
                     return calculateWidth(d, xBrush);
                 });
-            // update axes
+            // update x axes
+            drawAxes();
+        };
+
+        function drawAxes() {
             chart.select('.x.axis.top').call(xAxis.orient('top'));
             chart.select('.x.axis.bottom').call(xAxis2.orient('bottom'));
             context.select('.x.axis.context.bottom').call(xAxisBrush.orient('bottom'));
             context.select('.x.brush').call(brush.extent(focusExtent));
-        };
+        }
+        
+        // update x axes
+        drawAxes();
 
         let resize = function resize() {
             // update width
