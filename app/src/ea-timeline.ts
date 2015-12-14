@@ -159,7 +159,6 @@ module ea {
 
         // UPDATE
         var update = function(d: Array<TimelineProcess>) {
-
             let data = d;
             var height: number;
 
@@ -311,7 +310,10 @@ module ea {
                     return calculateWidth(d, xBrush);
                 });
 
-            // update axes
+            drawAxes();
+        };
+
+        function drawAxes() {
             chart.select('.x.axis.top').call(xAxis.orient('top'));
             chart.select('.x.axis.bottom').call(xAxis2.orient('bottom'));
             context.select('.x.axis.context.bottom').call(xAxisBrush.orient('bottom'));
@@ -324,9 +326,11 @@ module ea {
                 runningTasks.transition().duration(blinkAnimationDuration).delay(0)
                 .style("opacity", runningTasks.style("opacity") == "0.9" ? ".1" : "0.9")
         };
+        
+        // update x axes
+        drawAxes();
 
-
-        let resize = function() {
+        let resize = function resize() {
             // update width
             width = parseInt(element.style('width'), 10);
             width = width - margin.left - margin.right;
