@@ -22,6 +22,7 @@ module ea {
         let spacing = 2;
         let focusMargin = 35;
         let _mainBarHeight = 40;
+        let blinkAnimationDuration = 1000;
 
         let focusExtent = [d3.time.hour.offset(new Date(), -1 * 24), d3.time.hour.offset(new Date(), 0)];
         let contextExtent = [d3.time.day.offset(new Date(), -5), new Date()];
@@ -155,6 +156,7 @@ module ea {
             }
             return width;
         };
+
         // UPDATE
         var update = function(d: Array<TimelineProcess>) {
             let data = d;
@@ -191,8 +193,7 @@ module ea {
                 .attr('class', 'bar')
                 .append('rect')
                 .attr('class', 'background')
-                .attr('height', y.rangeBand())
-                .attr('width', width);
+                .attr('height', y.rangeBand());
 
             bars.attr('transform', (d, i) => {
                 let index = d3.map(data, (d) => { return d.key; }).keys().indexOf(d.key);
@@ -308,7 +309,7 @@ module ea {
                 .attr('width', (d) => {
                     return calculateWidth(d, xBrush);
                 });
-            // update x axes
+
             drawAxes();
         };
 
@@ -317,7 +318,14 @@ module ea {
             chart.select('.x.axis.bottom').call(xAxis2.orient('bottom'));
             context.select('.x.axis.context.bottom').call(xAxisBrush.orient('bottom'));
             context.select('.x.brush').call(brush.extent(focusExtent));
-        }
+        };
+
+        function animateBlink(duration) {
+            let runningTasks = d3.selectAll('.running');
+            if(!runningTasks.empty())
+                runningTasks.transition().duration(blinkAnimationDuration).delay(0)
+                .style("opacity", runningTasks.style("opacity") == "0.9" ? ".1" : "0.9")
+        };
         
         // update x axes
         drawAxes();
@@ -357,7 +365,9 @@ module ea {
             context.select('.x.brush').call(brush.extent(focusExtent));
         };
 
-        var intervalID = window.setInterval(() => { moveTimescale(); }, 1000);
+        var intervalID = window.setInterval(() => { moveTimescale() }, 1000);
+
+        var intervalID2 = window.setInterval(() => { animateBlink(blinkAnimationDuration) }, blinkAnimationDuration);
 
         return Object.freeze({
             resize,
