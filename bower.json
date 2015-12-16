@@ -1,0 +1,27 @@
+{
+  "name": "ea-timeline",
+  "description": "Reactive timeline/gantt chart using D3 written in typescript",
+  "main": "dist/ea-timeline.js",
+  "authors": [
+    "Sebastian Kropp"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "timeline",
+    "Gantt",
+    "D3",
+    "animated"
+  ],
+  "homepage": "https://github.com/sebastiankr/ea-timeline-ts",
+  "moduleType": [
+    "amd",
+    "es6"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
