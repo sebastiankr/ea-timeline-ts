@@ -20,8 +20,8 @@ var paths = {
     dest: 'app/build'
   },
   dist: {
-    src: ['app/build/**/*.{html,css,js}'],
-    srcJS: ['app/build/**/*.{js}'],
+    src: ['app/build/*.{html,css,js}'],
+    srcJS: ['app/build/*.js'],
     dest: 'dist'
   }
 };
@@ -63,39 +63,23 @@ gulp.task('copy:html', function () {
 });
 
 // ** Distribution ** //
-gulp.task('dist', ['dist:copy']);
+gulp.task('dist', ['dist:scripts']);
+
+// Process scripts and concatenate files into one output file
+gulp.task('dist:scripts', ['dist:clean'], function() {
+ return gulp.src(paths.dist.srcJS)
+ .pipe(jshint())
+ .pipe(jshint.reporter('default'))
+ .pipe(uglify())
+ .pipe(concat('ea-timeline.js'))
+ .pipe(gulp.dest(paths.dist.dest));
+});
 
 //remove all files from dist
 gulp.task('dist:clean', function() {
  return gulp.src(paths.dist.dest + '/*')
  .pipe(vinylPaths(del));
 });
-
-// log file paths in the stream
-gulp.task('log', function () {
-    return gulp.src(paths.dist.dest + '/*')
-        .pipe(vinylPaths(function (paths) {
-            console.log('Paths:', paths);
-            return Promise.resolve();
-        }));
-});
-
-//copy files from app/src to dist
-gulp.task('dist:copy', ['dist:clean'], function () {
-  return gulp.src(paths.dist.src)
-    .pipe(gulp.dest(paths.dist.dest));
-});
-
-// Process scripts and concatenate files into one output file
-gulp.task('dist:scripts', ['dist:clean'], function() {
- gulp.src(paths.dist.srcJS) //TODDO: try using vinylPaths like in log task
- .pipe(jshint())
- .pipe(jshint.reporter('default'))
- .pipe(uglify())
- .pipe(concat('app.min.js'))
- .pipe(gulp.dest(paths.dist.dest));
-});
-
 
 // ** Linting ** //
 
