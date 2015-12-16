@@ -4,6 +4,8 @@ var shell = require('gulp-shell');
 var runseq = require('run-sequence');
 var tslint = require('gulp-tslint');
 var browserSync = require('browser-sync').create();
+var del = require('del');
+var vinylPaths = require('vinyl-paths');
 
 var paths = {
   tscripts: {
@@ -13,6 +15,10 @@ var paths = {
   html: {
     src: ['app/src/**/*.{html,css,js}'],
     dest: 'app/build'
+  },
+  dist: {
+    src: ['app/build/**/*.{html,css,js}'],
+    dest: 'dist/'
   }
 };
 
@@ -52,6 +58,18 @@ gulp.task('copy:html', function () {
     .pipe(gulp.dest(paths.html.dest));
 });
 
+// ** Distribution ** //
+gulp.task('dist', ['dist:copy']);
+
+gulp.task('dist:clean', function() {
+ return gulp.src(paths.dist.dest)
+ .pipe(vinylPaths(del));
+});
+
+gulp.task('dist:copy', ['dist:clean'], function () {
+  return gulp.src(paths.html.src)
+    .pipe(gulp.dest(paths.dist.dest));
+});
 
 // ** Linting ** //
 
