@@ -6,6 +6,9 @@ var tslint = require('gulp-tslint');
 var browserSync = require('browser-sync').create();
 var del = require('del');
 var vinylPaths = require('vinyl-paths');
+var jshint = require('gulp-jshint');
+var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
 
 var paths = {
   tscripts: {
@@ -18,7 +21,8 @@ var paths = {
   },
   dist: {
     src: ['app/build/**/*.{html,css,js}'],
-    dest: 'dist/'
+    srcJS: ['app/build/**/*.{js}'],
+    dest: 'dist'
   }
 };
 
@@ -61,15 +65,37 @@ gulp.task('copy:html', function () {
 // ** Distribution ** //
 gulp.task('dist', ['dist:copy']);
 
+//remove all files from dist
 gulp.task('dist:clean', function() {
- return gulp.src(paths.dist.dest)
+ return gulp.src(paths.dist.dest + '/*')
  .pipe(vinylPaths(del));
 });
 
+// log file paths in the stream
+gulp.task('log', function () {
+    return gulp.src(paths.dist.dest + '/*')
+        .pipe(vinylPaths(function (paths) {
+            console.log('Paths:', paths);
+            return Promise.resolve();
+        }));
+});
+
+//copy files from app/src to dist
 gulp.task('dist:copy', ['dist:clean'], function () {
-  return gulp.src(paths.html.src)
+  return gulp.src(paths.dist.src)
     .pipe(gulp.dest(paths.dist.dest));
 });
+
+// Process scripts and concatenate files into one output file
+gulp.task('dist:scripts', ['dist:clean'], function() {
+ gulp.src(paths.dist.srcJS) //TODDO: try using vinylPaths like in log task
+ .pipe(jshint())
+ .pipe(jshint.reporter('default'))
+ .pipe(uglify())
+ .pipe(concat('app.min.js'))
+ .pipe(gulp.dest(paths.dist.dest));
+});
+
 
 // ** Linting ** //
 
