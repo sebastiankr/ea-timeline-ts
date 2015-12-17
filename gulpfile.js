@@ -71,7 +71,7 @@ gulp.task('dist:scripts', ['dist:clean'], function() {
  .pipe(jshint())
  .pipe(jshint.reporter('default'))
  .pipe(uglify())
- .pipe(concat('ea-timeline.js'))
+ //.pipe(concat('ea-timeline.js'))
  .pipe(gulp.dest(paths.dist.dest));
 });
 
