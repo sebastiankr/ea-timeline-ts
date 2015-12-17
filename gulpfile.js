@@ -4,6 +4,11 @@ var shell = require('gulp-shell');
 var runseq = require('run-sequence');
 var tslint = require('gulp-tslint');
 var browserSync = require('browser-sync').create();
+var del = require('del');
+var vinylPaths = require('vinyl-paths');
+var jshint = require('gulp-jshint');
+var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
 
 var paths = {
   tscripts: {
@@ -13,6 +18,11 @@ var paths = {
   html: {
     src: ['app/src/**/*.{html,css,js}'],
     dest: 'app/build'
+  },
+  dist: {
+    src: ['app/build/*.{html,css,js}'],
+    srcJS: ['app/build/*.js'],
+    dest: 'dist'
   }
 };
 
@@ -52,6 +62,24 @@ gulp.task('copy:html', function () {
     .pipe(gulp.dest(paths.html.dest));
 });
 
+// ** Distribution ** //
+gulp.task('dist', ['dist:scripts']);
+
+// Process scripts and concatenate files into one output file
+gulp.task('dist:scripts', ['dist:clean'], function() {
+ return gulp.src(paths.dist.srcJS)
+ .pipe(jshint())
+ .pipe(jshint.reporter('default'))
+ .pipe(uglify())
+ //.pipe(concat('ea-timeline.js'))
+ .pipe(gulp.dest(paths.dist.dest));
+});
+
+//remove all files from dist
+gulp.task('dist:clean', function() {
+ return gulp.src(paths.dist.dest + '/*')
+ .pipe(vinylPaths(del));
+});
 
 // ** Linting ** //
 
