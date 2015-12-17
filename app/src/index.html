@@ -98,9 +98,9 @@ window.onload = function runD3code() {
 
         d3.select("#addfunction").on("click", function () {
           var item = d[Math.floor(Math.random()*d.length)];
-          
+          var statCode = Math.floor(Math.random()*9+1);
           item.values.push(
-           { name: 'added function', startTime: d3.time.hour.offset(new Date(), 0) , status: 1}
+           { name: 'added function', startTime: d3.time.hour.offset(new Date(), 0) , status: statCode}
           );
           t.update(d);          
         });  
