@@ -1,6 +1,6 @@
 {
   "name": "ea-timeline-ts",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Sebastian Kropp",
   "devDependencies": {
     "browser-sync": "^2.10.0",
