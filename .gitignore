@@ -2,3 +2,4 @@ node_modules
 app/build
 typings
 .vscode
+bower_components
