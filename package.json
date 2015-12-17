@@ -23,4 +23,3 @@
     "test": "gulp build && mocha"
   }
 }
-
