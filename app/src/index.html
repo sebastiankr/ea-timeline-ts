@@ -74,13 +74,19 @@ window.onload = function runD3code() {
            { key: 'Process 4', name: 'Task 12', startTime: d3.time.hour.offset(new Date(), -5), endTime: d3.time.hour.offset(new Date(), -3), status: 2, docLink: 'http://google.com' },
            { key: 'Process 4', name: 'Task 13', startTime: d3.time.hour.offset(new Date(), -2), endTime: d3.time.hour.offset(new Date(), -1), status: 1, docLink: 'http://google.com' },      
        ];
-       
+
+       var config = { 
+                "contextVisibility" : "visible",
+                "contextHeight" : 50
+        };
+
         var nestBykey = d3.nest().key(function (d) { return d.key });
         var d = nestBykey.entries(data);
        
         var t = ea.timeline({
           element: d3.select('#chart'),
-          data: d
+          data: d,
+          config: config
         });
          
 
@@ -93,7 +99,7 @@ window.onload = function runD3code() {
         
         d3.select("#removeclient").on("click", function () {
           d.pop();
-          t.update(d);          
+          t.update(d);
         });
 
         d3.select("#addfunction").on("click", function () {

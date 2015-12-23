@@ -9,6 +9,7 @@ var vinylPaths = require('vinyl-paths');
 var jshint = require('gulp-jshint');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
+var sass = require('gulp-sass');
 
 var paths = {
   tscripts: {
@@ -23,6 +24,10 @@ var paths = {
     src: ['app/build/*.{html,css,js}'],
     srcJS: ['app/build/*.js'],
     dest: 'dist'
+  },
+  sass: {
+    src: ['app/src/**/*{.sass,.scss}'],
+    dest: 'app/build'
   }
 };
 
@@ -43,6 +48,17 @@ gulp.task('buildrun', function (cb) {
 gulp.task('watch', function () {
   gulp.watch(paths.tscripts.src + '**/*.ts', ['compile:typescript']);
   gulp.watch(paths.html.src, ['copy:html']);
+});
+
+gulp.task('watch:sass', function () {
+  gulp.watch(paths.sass.src, ['sass']);
+});
+
+gulp.task('sass', function () {
+  return gulp
+    .src(paths.sass.src)
+    .pipe(sass().on('error', sass.logError))
+    .pipe(gulp.dest(paths.sass.dest));
 });
 
 // ** Compilation ** //
@@ -102,5 +118,6 @@ gulp.task('serve', ['build'], function () {
   });
 
   gulp.watch(paths.tscripts.src + '**/*.ts', ['compile:typescript']);
-  gulp.watch(paths.html.src, ['copy:html']).on('change', browserSync.reload);;
+  gulp.watch(paths.html.src, ['copy:html']).on('change', browserSync.reload);
+  gulp.watch(paths.sass.src, ['sass']);
 });
