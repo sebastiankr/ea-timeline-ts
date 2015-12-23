@@ -1,6 +1,9 @@
 {
     "compilerOptions": {
-        "target": "ES5",
+        "target": "es5",
         "sourceMap": false
-    }
+    },
+    "files": [
+        "ea-timeline.ts"
+    ]
 }
