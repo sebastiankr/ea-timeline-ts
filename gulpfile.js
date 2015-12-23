@@ -33,37 +33,19 @@ var paths = {
 
 var tsProject = ts.createProject(paths.tscripts.src + 'tsconfig.json');
 
-gulp.task('default', ['lint', 'buildrun']);
-
-// ** Running ** //
-
-gulp.task('run', ['browser-sync']);
-
-gulp.task('buildrun', function (cb) {
-  runseq('build', 'run', cb);
-});
+gulp.task('default', ['build']);
 
 // ** Watching ** //
 
 gulp.task('watch', function () {
   gulp.watch(paths.tscripts.src + '**/*.ts', ['compile:typescript']);
   gulp.watch(paths.html.src, ['copy:html']);
-});
-
-gulp.task('watch:sass', function () {
-  gulp.watch(paths.sass.src, ['sass']);
-});
-
-gulp.task('sass', function () {
-  return gulp
-    .src(paths.sass.src)
-    .pipe(sass().on('error', sass.logError))
-    .pipe(gulp.dest(paths.sass.dest));
+  gulp.watch(paths.sass.src, ['compile:sass']);
 });
 
 // ** Compilation ** //
 
-gulp.task('build', ['copy:html', 'compile:typescript']);
+gulp.task('build', ['copy:html', 'compile:sass', 'compile:typescript']);
 gulp.task('compile:typescript', function () {
   var tsResult = tsProject.src() 
     .pipe(ts(tsProject));
@@ -76,6 +58,13 @@ gulp.task('copy:html', function () {
   return gulp
     .src(paths.html.src)
     .pipe(gulp.dest(paths.html.dest));
+});
+
+gulp.task('compile:sass', function () {
+  return gulp
+    .src(paths.sass.src)
+    .pipe(sass().on('error', sass.logError))
+    .pipe(gulp.dest(paths.sass.dest));
 });
 
 // ** Distribution ** //
@@ -108,7 +97,7 @@ gulp.task('lint:default', function () {
     }));
 });
 
-// ** Static Web Server ** //
+// ** browser-sync Web Server ** //
 
 gulp.task('serve', ['build'], function () {
   browserSync.init({
