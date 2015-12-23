@@ -33,7 +33,8 @@ module ea {
             width = 100;
         }
         let height = 200; // placeholder
-        let contextHeight = 100;
+        let contextHeight = spec.config.contextHeight; //original value = 100;
+        let contextVisibility = spec.config.contextVisibility;
         //var barHeight = 40;
 
         let percent = d3.format('%');
@@ -82,6 +83,8 @@ module ea {
         // create the chart
         let svg = element.append('svg')
             .style('width', (width + margin.left + margin.right) + 'px');
+
+        //add the focus to the svg
         let chart = svg.append('g')
             .attr('class', 'focus')
             .attr('transform', 'translate(' + [margin.left, margin.top] + ')');
@@ -113,11 +116,13 @@ module ea {
                 + 'V' + (2 * y - 8);
         };
 
-        // render the brush
+        // add the context to the svg
+        //render the brush
         // add top and bottom axes
         let context = svg.append('g')
             .attr('class', 'context')
-            .attr('transform', 'translate(' + [margin.left, 0] + ')');
+            .attr('transform', 'translate(' + [margin.left, 0] + ')')
+            .attr('style', 'visibility:' + contextVisibility + ';');
 
         context.append('g')
             .attr('class', 'x axis context bottom')
@@ -162,9 +167,8 @@ module ea {
             let data = d;
             var height: number;
 
-            y
-                .domain(data.map(function(d) { return d.key; }))
-                .rangeBands([0, data.length * _mainBarHeight]);
+            y.domain(data.map(function(d) { return d.key; }))
+             .rangeBands([0, data.length * _mainBarHeight]);
             yAxis.scale(y);
             chart.select('.y.axis').call(yAxis.orient('left'));
             //TODO xAxisi missing
@@ -193,7 +197,8 @@ module ea {
                 .attr('class', 'bar')
                 .append('rect')
                 .attr('class', 'background')
-                .attr('height', y.rangeBand());
+                .attr('height', y.rangeBand())
+                .attr('width', width);
 
             bars.attr('transform', (d, i) => {
                 let index = d3.map(data, (d) => { return d.key; }).keys().indexOf(d.key);
@@ -322,11 +327,12 @@ module ea {
 
         function animateBlink(duration) {
             let runningTasks = d3.selectAll('.running');
-            if(!runningTasks.empty())
+            if (!runningTasks.empty()) {
                 runningTasks.transition().duration(blinkAnimationDuration).delay(0)
-                .style("opacity", runningTasks.style("opacity") == "0.9" ? ".1" : "0.9")
+                .style('opacity', runningTasks.style('opacity') === '0.9' ? '.1' : '0.9');
+            }
         };
-        
+
         // update x axes
         drawAxes();
 
@@ -365,9 +371,9 @@ module ea {
             context.select('.x.brush').call(brush.extent(focusExtent));
         };
 
-        var intervalID = window.setInterval(() => { moveTimescale() }, 1000);
+        var intervalID = window.setInterval(() => { moveTimescale(); }, 1000);
 
-        var intervalID2 = window.setInterval(() => { animateBlink(blinkAnimationDuration) }, blinkAnimationDuration);
+        var intervalID2 = window.setInterval(() => { animateBlink(blinkAnimationDuration); }, blinkAnimationDuration);
 
         return Object.freeze({
             resize,
