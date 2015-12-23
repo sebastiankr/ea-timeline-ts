@@ -3,3 +3,4 @@ app/build
 typings
 .vscode
 bower_components
+dist
